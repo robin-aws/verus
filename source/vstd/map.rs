@@ -108,17 +108,26 @@ impl<K, V> Map<K, V> {
         self.dom().len()
     }
 
+    /// Create an empty tracked map.
+    ///
+    /// This allows us to create a map, which we know is empty, that is _tracked_.
     pub axiom fn tracked_empty() -> (tracked out_v: Self)
         ensures
             out_v == Map::<K, V>::empty(),
     ;
 
+    /// Inserts the given `(key, tracked value)` pair into the map.
+    ///
+    /// If the key is already present from the map, then its existing value is overwritten
+    /// by the new value.
     pub axiom fn tracked_insert(tracked &mut self, key: K, tracked value: V)
         ensures
             *self == Map::insert(*old(self), key, value),
     ;
 
-    /// todo fill in documentation
+    /// Removes the given key and its associated _tracked_ value from the map.
+    ///
+    /// The key must exist in the map
     pub axiom fn tracked_remove(tracked &mut self, key: K) -> (tracked v: V)
         requires
             old(self).dom().contains(key),
@@ -127,6 +136,7 @@ impl<K, V> Map<K, V> {
             v == old(self)[key],
     ;
 
+    /// Index into a tracked map, getting a tracked borrow to the value
     pub axiom fn tracked_borrow(tracked &self, key: K) -> (tracked v: &V)
         requires
             self.dom().contains(key),
@@ -134,6 +144,10 @@ impl<K, V> Map<K, V> {
             *v === self.index(key),
     ;
 
+    /// Change the keys of a map, by lookup in a different map.
+    ///
+    /// For all the `(key, value)` pairs in the old map,
+    /// the new map will have `(key, key_map[key])`
     pub axiom fn tracked_map_keys<J>(
         tracked old_map: Map<K, V>,
         key_map: Map<J, K>,
@@ -154,6 +168,9 @@ impl<K, V> Map<K, V> {
                 ) == old_map.index(key_map.index(j)),
     ;
 
+    /// Extract a set of keys out of the map.
+    ///
+    /// This allows us to split a map based on a subset of the domain.
     pub axiom fn tracked_remove_keys(tracked &mut self, keys: Set<K>) -> (tracked out_map: Map<
         K,
         V,
@@ -165,6 +182,9 @@ impl<K, V> Map<K, V> {
             out_map == old(self).restrict(keys),
     ;
 
+    /// Merge a map into a tracked map.
+    ///
+    /// The new (key, value) pairs take precendece.
     pub axiom fn tracked_union_prefer_right(tracked &mut self, right: Self)
         ensures
             *self == old(self).union_prefer_right(right),
