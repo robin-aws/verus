@@ -259,6 +259,7 @@ fn handle_autospec<'tcx>(
                     exec_allows_no_decreases_clause: false,
                     ignore_outside_new_mut_ref: functionx.attrs.ignore_outside_new_mut_ref,
                     tracked_swap: false,
+                    tracked_take_option: false,
                 }),
                 body: Some(ret_clause.clone()),
                 extra_dependencies: functionx.extra_dependencies.clone(),
@@ -1316,6 +1317,7 @@ fn make_attributes<'tcx>(
         },
         ignore_outside_new_mut_ref,
         tracked_swap: vattrs.tracked_swap,
+        tracked_take_option: vattrs.tracked_take_option,
     };
     Ok(Arc::new(fattrs))
 }
